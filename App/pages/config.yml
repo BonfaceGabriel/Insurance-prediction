@@ -1,0 +1,12 @@
+html:
+  
+  # Styling options for the HTML report
+  style:
+    theme: united
+    logo: ""
+    primary_colors:
+      - "#0d6efd"
+      - "#dc3545"
+      - "#198754"
+
+  full_width: True
