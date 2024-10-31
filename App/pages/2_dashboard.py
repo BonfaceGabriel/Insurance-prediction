@@ -15,7 +15,7 @@ with open('/home/gabriel/financial-dataset/Insurance-prediction/App/pages/style.
 
 st.sidebar.header('Dashboard `version 1`')
 
-st.sidebar.subheader('Donut Chart parameters')
+st.sidebar.subheader('Chart parameters')
 attribute = st.sidebar.selectbox('Select data', ('most_important_life_goal', 'income_source', 'nearest_financial_prod'))
 
 st.sidebar.subheader('Scatter chart size')
@@ -30,6 +30,8 @@ count = data['area'].value_counts().to_list()
 urban_pop = count[0]
 rural_pop = count[1]
 total = data['area'].count()
+
+st.title('DASHBOARD')
 
 #Row A
 col1, col2, col3 = st.columns(3)
@@ -81,4 +83,31 @@ with c2:
     st.pyplot(plt)
 
 #Row D
+c1, c2 = st.columns(2)
+with c1:
+    st.subheader('Insurance use by Average Monthly Income')
+    data['income_bins'] = pd.cut(data['avg_mnth_income'], bins=[0, 10000, 20000, 50000, data['avg_mnth_income'].max()],
+                                labels=['Low Income', 'Middle Income', 'High Income', 'Very High Income'])
+
+    # Bar plot for insurance usage across income bins
+    plt.figure(figsize=(10, 5))
+    sns.countplot(x='income_bins', hue='insurance', data=data)
+    plt.xlabel('Income Level')
+    plt.ylabel('Count')
+    st.pyplot(plt)
+
+with c2:
+    st.subheader('Insurance Use by Attribute')
+    plt.figure(figsize=(10, 5))
+    sns.countplot(x=attribute, hue='insurance', data=data)
+    if attribute == 'nearest_financial_prod':
+        plt.xlabel('Nearest Financial Product')
+    elif attribute == 'most_important_life_goal':
+        plt.xlabel('Most Important Life Goal')
+    else:
+        plt.xlabel('Source of Income')
+    
+    plt.ylabel('Count')
+    st.pyplot(plt)
+    
 
