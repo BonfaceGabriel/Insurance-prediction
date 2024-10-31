@@ -3,6 +3,8 @@ import pandas as pd
 import plost
 import matplotlib.pyplot as plt
 from streamlit_extras.metric_cards import style_metric_cards
+import seaborn as sns
+sns.set()
 
 data = pd.read_csv('../Nakuru_FinAccess1.csv')
 
@@ -43,12 +45,12 @@ style_metric_cards(
     box_shadow = True)
 
 #Row B
-c1, c2 = st.columns((7, 3))
+c1, c2 = st.columns((5, 4))
 with c1:
     st.subheader('Age Distribution')
     plt.style.use('dark_background')
-    fig, ax = plt.subplots()
-    ax.hist(data['age_of_respondent'])
+    fig, ax = plt.subplots(figsize=(5, 3))
+    ax.hist(data['age_of_respondent'], edgecolor='black')
     st.pyplot(fig)
 
 with c2:
@@ -67,5 +69,16 @@ with c2:
     )
 
 #Row C
-st.subheader('Monthly Income vs Expenditure')
+c1, c2 = st.columns((6, 4))
+with c1:
+    st.subheader('Monthly Income vs Expenditure')
+    st.scatter_chart(data, x='avg_mnth_income', y='total_exp_per_moth', height=plot_height)
+with c2:
+    st.subheader('Use of insurance by Area')
+    sns.countplot(x='area', hue='insurance', data=data)
+    plt.xlabel('Area')
+    plt.ylabel('Count')
+    st.pyplot(plt)
+
+#Row D
 
