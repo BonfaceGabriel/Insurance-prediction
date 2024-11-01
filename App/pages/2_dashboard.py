@@ -10,11 +10,6 @@ data = pd.read_csv('../Nakuru_FinAccess1.csv')
 
 st.set_page_config(layout='wide', initial_sidebar_state='expanded')
 
-with open('/home/gabriel/financial-dataset/Insurance-prediction/App/pages/style.css') as f:
-    st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
-
-st.sidebar.header('Dashboard `version 1`')
-
 st.sidebar.subheader('Chart parameters')
 attribute = st.sidebar.selectbox('Select data', ('most_important_life_goal', 'income_source', 'nearest_financial_prod'))
 

@@ -5,6 +5,6 @@ from streamlit_pandas_profiling import st_profile_report
 
 
 data = pd.read_csv('../Nakuru_FinAccess1.csv')
-pr = ProfileReport(data, config_file='/home/gabriel/financial-dataset/Insurance-prediction/App/pages/config.yml')
+pr = ProfileReport(data, config_file='/home/gabriel/financial-dataset/Insurance-prediction/App/configs_and_styles/config.yml')
 
 st_profile_report(pr)
