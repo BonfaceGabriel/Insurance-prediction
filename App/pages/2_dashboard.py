@@ -11,10 +11,10 @@ data = pd.read_csv('../Nakuru_FinAccess1.csv')
 st.set_page_config(layout='wide', initial_sidebar_state='expanded')
 
 st.sidebar.subheader('Chart parameters')
-attribute = st.sidebar.selectbox('Select data', ('most_important_life_goal', 'income_source', 'nearest_financial_prod'))
+attribute = st.sidebar.selectbox('Select attribute', ('most_important_life_goal', 'income_source', 'nearest_financial_prod'))
 
 st.sidebar.subheader('Scatter chart size')
-plot_height = st.sidebar.slider('Specify plot height', 200, 500, 250)
+plot_height = st.sidebar.slider('Specify plot height', 200, 500, 400)
 
 st.sidebar.markdown('''
 ---
