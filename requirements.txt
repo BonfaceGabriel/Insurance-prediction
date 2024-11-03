@@ -22,7 +22,7 @@ htmlmin==0.1.12
 idna==3.10
 ImageHash==4.3.1
 Jinja2==3.1.4
-joblib==1.4.2
+joblib
 jsonschema==4.23.0
 jsonschema-specifications==2024.10.1
 kiwisolver==1.4.7
@@ -98,7 +98,7 @@ typing_extensions==4.12.2
 tzdata==2024.2
 urllib3==2.2.3
 validators==0.34.0
-visions==0.7.6
+visions
 watchdog==5.0.3
 wordcloud==1.9.3
 ydata-profiling==4.12.0
