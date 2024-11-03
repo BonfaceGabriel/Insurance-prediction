@@ -10,30 +10,34 @@ from sklearn.preprocessing import StandardScaler
 #data
 data = pd.read_csv('../Nakuru_FinAccess.csv')
 data.drop(columns=['HHNo', 'income_bins'], inplace=True)
+data['most_important_life_goal'] = data['most_important_life_goal'].fillna('None')
 cluster1 = data[data['Clusters'] == 0]
 cluster2 = data[data['Clusters'] == 1]
 cluster3 = data[data['Clusters'] == 2]
 
-cluster_data = data.copy()
-cluster_data['most_important_life_goal'] = cluster_data['most_important_life_goal'].fillna('None')
+#SHAP
+shap_data = data.copy()
+shap_data = shap_data.drop(columns='Clusters')
 
+#cluster_data
+cluster_data = shap_data.copy()
 
 #preprocess data
 #scale numerical columns
 scaler = StandardScaler()
-scaled_data = scaler.fit_transform(cluster_data[['age_of_respondent', 'avg_mnth_income', 'total_exp_per_month']])
-cluster_data[['age_of_respondent', 'avg_mnth_income', 'total_exp_per_month']] = scaled_data
+scaled_data = scaler.fit_transform(shap_data[['age_of_respondent', 'avg_mnth_income', 'total_exp_per_month']])
+shap_data[['age_of_respondent', 'avg_mnth_income', 'total_exp_per_month']] = scaled_data
 
 #encode categorical columns
 cat_cols = ['most_important_life_goal', 'area', 'income_source', 'nearest_financial_prod']
-encoded = pd.get_dummies(cluster_data[cat_cols])
+encoded = pd.get_dummies(shap_data[cat_cols])
 
 #join the data
-cluster_data = pd.concat([cluster_data.drop(cat_cols, axis=1), encoded], axis=1)
+shap_data = pd.concat([shap_data.drop(cat_cols, axis=1), encoded], axis=1)
 
 #convert object type columns to bool for shap model
-cols = cluster_data.select_dtypes(include=['object']).columns
-cluster_data[cols] = cluster_data[cols].astype('bool')
+cols = shap_data.select_dtypes(include=['object']).columns
+shap_data[cols] = shap_data[cols].astype('bool')
 
 
 #load models
@@ -70,26 +74,26 @@ c.markdown('''
 
 if st.sidebar.checkbox("Show SHAP Summary Plots"):
             explainer = shap.TreeExplainer(classifier)
-            shap_values = explainer.shap_values(cluster_data)
+            shap_values = explainer.shap_values(shap_data)
 
             c1, c2 = st.columns(2)
             with c1:
                 st.write("SHAP Summary for Cluster 1")
                 shap_values_for_cluster1 = shap_values[:, :, 0]
                 fig, ax = plt.subplots()
-                ax = shap.summary_plot(shap_values_for_cluster1, cluster_data, plot_type="bar", show=False)
+                ax = shap.summary_plot(shap_values_for_cluster1, shap_data, plot_type="bar", show=False)
                 st.pyplot(fig)
             with c2:
                 st.write("SHAP Summary for Cluster 2")
                 shap_values_for_cluster2 = shap_values[:, :, 1]
                 fig, ax = plt.subplots()
-                ax = shap.summary_plot(shap_values_for_cluster2, cluster_data, plot_type="bar", show=False)
+                ax = shap.summary_plot(shap_values_for_cluster2, shap_data, plot_type="bar", show=False)
                 st.pyplot(fig)
 
             st.write("SHAP Summary for Cluster 3")
             shap_values_for_cluster3 = shap_values[:, :, 2]
             fig, ax = plt.subplots()
-            ax = shap.summary_plot(shap_values_for_cluster3, cluster_data, plot_type="bar", show=False)
+            ax = shap.summary_plot(shap_values_for_cluster3, shap_data, plot_type="bar", show=False)
             st.pyplot(fig)
 
 uploaded_file = st.sidebar.file_uploader("Upload your input CSV file", type=["csv"])
@@ -135,13 +139,11 @@ else:
         features = pd.DataFrame(data, index=[0])
         return features
     input_df = user_input_features()
+    st.subheader('User Input')
     st.write(input_df)
-
-    pred_data = pd.concat([cluster_data.drop('Clusters', axis=1), input_df]).reset_index(drop=True)
-    cols = pred_data.select_dtypes(include=['object']).columns
-    print(pred_data[cols].info())
-    pred_data[cols] = pred_data[cols].astype('bool')
-    pred_data =  pred_data.drop()
+    
+    #prediction data
+    pred_data = pd.concat([cluster_data, input_df]).reset_index(drop=True)
     
 
     #preprocess input data
@@ -156,17 +158,20 @@ else:
 
     #processed data
     processed_data = pd.concat([pred_data.drop(cat_cols, axis=1), encoded], axis=1)
-    print(processed_data.info())
+    cols = processed_data.select_dtypes(include=['object']).columns
+    processed_data[cols] = processed_data[cols].astype('bool')
    
 
     #predict
-    pred_df = processed_data.tail(1) 
+    pred_df = processed_data.tail(1)
     prediction = classifier.predict(pred_df)
     
+    st.subheader('Insurance Product Prediction')
     if prediction == 0:
         c = st.container(border=True)
         c.markdown('''
             The customer belongs to cluster 1.
+
             Cluster Description:
             - Old low income farmers
             
@@ -181,6 +186,7 @@ else:
         c = st.container(border=True)
         c.markdown('''
             The customer belongs to Cluster 2.
+            
             Cluster Description:
             - Young small business owners
             
@@ -193,7 +199,8 @@ else:
     else:
         c = st.container(border=True)
         c.markdown('''
-            The customer belongs to Cluster 2.
+            The customer belongs to Cluster 3.
+
             Cluster Description:
             - Middle aged, average sized business owners 
             
@@ -204,6 +211,11 @@ else:
             - Life insurance
 
             ''')
+
+    st.markdown('''
+                ---
+                Created with ❤️ by :red-background[Bonface Odhiambo]
+                ''')
 
 
 

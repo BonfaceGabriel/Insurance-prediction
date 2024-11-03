@@ -14,12 +14,8 @@ st.sidebar.subheader('Chart parameters')
 attribute = st.sidebar.selectbox('Select attribute', ('most_important_life_goal', 'income_source', 'nearest_financial_prod'))
 
 st.sidebar.subheader('Scatter chart size')
-plot_height = st.sidebar.slider('Specify plot height', 200, 500, 400)
+plot_height = st.sidebar.slider('Specify plot height', 200, 500, 350)
 
-st.sidebar.markdown('''
----
-Created with ❤️ by [Bonface Odhiambo]
-''')
 
 count = data['area'].value_counts().to_list()
 urban_pop = count[0]
@@ -104,5 +100,11 @@ with c2:
     
     plt.ylabel('Count')
     st.pyplot(plt)
+
+st.markdown('''
+---
+Created with ❤️ by [Bonface Odhiambo]
+''')
+
     
 
