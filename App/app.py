@@ -105,9 +105,9 @@ else:
         most_important_life_goal = st.sidebar.selectbox('Most Important Life Goal',('Food','Education', 'Health', 'Business', 'Career', 'Home', 'Assets', 'None'))
         nearest_financial_prod = st.sidebar.selectbox('Nearest Financial Product',('MMoney','Bank', 'Insurance'))
         area = st.sidebar.selectbox('Area',('Urban','Rural'))
-        avg_mnth_income = st.sidebar.number_input('Average Monthly Income')
-        total_exp_per_month = st.sidebar.number_input('Monthly Expenditure')
-        age_of_respondent = st.sidebar.number_input('Age of Respondent')
+        avg_mnth_income = st.sidebar.number_input('Average Monthly Income', min_value=100)
+        total_exp_per_month = st.sidebar.number_input('Monthly Expenditure', min_value = 500)
+        age_of_respondent = st.sidebar.number_input('Age of Respondent', min_value=16)
         chronic_illness = st.sidebar.checkbox('Chronic Illness')
         nhif_usage = st.sidebar.checkbox('Use NHIF')
         nssf_usage = st.sidebar.checkbox('Use NSSF')
@@ -165,52 +165,54 @@ else:
     #predict
     pred_df = processed_data.tail(1)
     prediction = classifier.predict(pred_df)
-    
-    st.subheader('Insurance Product Prediction')
-    if prediction == 0:
-        c = st.container(border=True)
-        c.markdown('''
-            The customer belongs to cluster 1.
 
-            Cluster Description:
-            - Old low income farmers
-            
-            Probable insurance product:
-            - Crop Insurance
-            - Livestock Insurance
-            - Basic Health Insurance
-            - Term Life Insurance
 
-            ''')
-    elif prediction == 1:
-        c = st.container(border=True)
-        c.markdown('''
-            The customer belongs to Cluster 2.
-            
-            Cluster Description:
-            - Young small business owners
-            
-            Probable insurance product:
-            - Business property insurance
-            - General liability insurance
-            - Professional liability insurance(if applicable to the business)
+    if st.button('Make Prediction'):
+        st.subheader('Insurance Product Prediction')
+        if prediction == 0:
+            c = st.container(border=True)
+            c.markdown('''
+                The customer belongs to cluster 1.
 
-            ''')
-    else:
-        c = st.container(border=True)
-        c.markdown('''
-            The customer belongs to Cluster 3.
+                Cluster Description:
+                - Old low income farmers
+                
+                Probable insurance product:
+                - Crop Insurance
+                - Livestock Insurance
+                - Basic Health Insurance
+                - Term Life Insurance
 
-            Cluster Description:
-            - Middle aged, average sized business owners 
-            
-            Probable insurance product:
-            - Workers compensation Insurance(if applicable)
-            - Business property insurance
-            - Product liability insurance
-            - Life insurance
+                ''')
+        elif prediction == 1:
+            c = st.container(border=True)
+            c.markdown('''
+                The customer belongs to Cluster 2.
+                
+                Cluster Description:
+                - Young small business owners
+                
+                Probable insurance product:
+                - Business property insurance
+                - General liability insurance
+                - Professional liability insurance(if applicable to the business)
 
-            ''')
+                ''')
+        else:
+            c = st.container(border=True)
+            c.markdown('''
+                The customer belongs to Cluster 3.
+
+                Cluster Description:
+                - Middle aged, average sized business owners 
+                
+                Probable insurance product:
+                - Workers compensation Insurance(if applicable)
+                - Business property insurance
+                - Product liability insurance
+                - Life insurance
+
+                ''')
 
     st.markdown('''
                 ---
