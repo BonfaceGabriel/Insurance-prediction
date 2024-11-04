@@ -59,6 +59,7 @@ pydeck==0.9.1
 Pygments==2.18.0
 pymdown-extensions==10.12
 pyparsing==3.2.0
+python==3.9
 python-dateutil==2.9.0.post0
 pytz==2024.2
 PyWavelets==1.7.0
