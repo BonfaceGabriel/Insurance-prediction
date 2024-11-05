@@ -101,6 +101,5 @@ tzdata==2024.2
 urllib3==2.2.3
 validators==0.34.0
 visions==0.7.6
-watchdog==5.0.3
-wordcloud==1.9.3
+watchdog
 ydata-profiling==4.12.0
