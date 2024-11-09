@@ -4,6 +4,7 @@ joblib
 lightgbm
 matplotlib
 shap
+phik
 ydata-profiling
 streamlit-pandas-profiling
 streamlit-extras
