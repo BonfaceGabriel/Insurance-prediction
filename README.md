@@ -30,9 +30,7 @@ The App has three pages:
 App:
 - Sidebar where the user uploads a CSV or manually inputs data
 - User input is shown after app introduction.
-- BUtton to make the prediction and recommendation.
-- Dashboard for various visualizations
-- Profile for general information on data used
+- Button to make the prediction and recommendation.
 
 Profile:
 - Shows data profile
