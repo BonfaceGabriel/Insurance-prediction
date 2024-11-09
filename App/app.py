@@ -41,8 +41,8 @@ shap_data[cols] = shap_data[cols].astype('bool')
 
 
 #load models
-classifier = joblib.load('./models/classifier.joblib')
-cluster = joblib.load('./models/kproto.joblib')
+classifier = joblib.load('App/models/classifier.joblib')
+cluster = joblib.load('App/models/kproto.joblib')
  
 #title
 st.title('Insurance Product Prediction App')
