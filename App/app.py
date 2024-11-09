@@ -8,7 +8,7 @@ from sklearn.preprocessing import StandardScaler
 
 
 #data
-data = pd.read_csv('../Nakuru_FinAccess.csv')
+data = pd.read_csv('./data/Nakuru_FinAccess.csv')
 data.drop(columns=['HHNo', 'income_bins'], inplace=True)
 data['most_important_life_goal'] = data['most_important_life_goal'].fillna('None')
 cluster1 = data[data['Clusters'] == 0]

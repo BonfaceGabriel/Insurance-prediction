@@ -6,7 +6,7 @@ from streamlit_extras.metric_cards import style_metric_cards
 import seaborn as sns
 sns.set()
 
-data = pd.read_csv('../Nakuru_FinAccess1.csv')
+data = pd.read_csv('./data/Nakuru_FinAccess1.csv')
 
 st.set_page_config(layout='wide', initial_sidebar_state='expanded')
 
