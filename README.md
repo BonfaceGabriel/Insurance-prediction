@@ -23,6 +23,7 @@ Features:
 - Fork the repository
 - Run *pip install -r requirements.txt* to install required dependencies
 - Run *streamlit run app.py*
+- Demo *https://insurance-service-prediction.streamlit.app/*
 
 ##### Navigation
 The App has three pages:
