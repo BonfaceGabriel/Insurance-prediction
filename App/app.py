@@ -139,16 +139,9 @@ preprocess_data[num_cols] = scaled_data
 #categorical column
 cat_cols = ['most_important_life_goal', 'area', 'income_source', 'nearest_financial_prod']
 
-<<<<<<< HEAD
-    #processed data
-    processed_data = pd.concat([preprocess_data.drop(cat_cols, axis=1), one_hot_df], axis=1)
-    cols = processed_data.select_dtypes(include=['object']).columns
-    processed_data[cols] = processed_data[cols].astype('bool') 
-=======
 encoded = encoder.transform(preprocess_data[cat_cols])
 one_hot_df = pd.DataFrame(encoded, 
                         columns=encoder.get_feature_names_out(cat_cols))
->>>>>>> 9330e5f (CSV importation and prediction)
 
 #processed data
 processed_data = pd.concat([preprocess_data.drop(cat_cols, axis=1), one_hot_df], axis=1)
