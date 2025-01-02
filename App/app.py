@@ -8,14 +8,14 @@ from sklearn.preprocessing import OneHotEncoder
 
 
 #data
-data = pd.read_csv('./data/Nakuru_FinAccess2.csv')
+data = pd.read_csv('App/data/Nakuru_FinAccess2.csv')
 # st.write(data)
 
 #load models
-classifier = joblib.load('./models/classifier.joblib')
-cluster = joblib.load('./models/new_model.joblib')
-scaler = joblib.load('./models/scaler.joblib')
-encoder = joblib.load('./models/encoder.joblib')
+classifier = joblib.load('App/models/classifier.joblib')
+cluster = joblib.load('App/models/new_model.joblib')
+scaler = joblib.load('App/models/scaler.joblib')
+encoder = joblib.load('App/models/encoder.joblib')
 
 print(cluster.cost_)
 #recommendended insurance products
@@ -147,8 +147,7 @@ else:
     #processed data
     processed_data = pd.concat([preprocess_data.drop(cat_cols, axis=1), one_hot_df], axis=1)
     cols = processed_data.select_dtypes(include=['object']).columns
-    processed_data[cols] = processed_data[cols].astype('bool')
-    print(processed_data.info()) 
+    processed_data[cols] = processed_data[cols].astype('bool') 
 
     #predict
     prediction = classifier.predict(processed_data)
