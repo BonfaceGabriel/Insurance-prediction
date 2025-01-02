@@ -6,7 +6,7 @@ from streamlit_extras.metric_cards import style_metric_cards
 import seaborn as sns
 sns.set()
 
-data = pd.read_csv('App/data/Nakuru_FinAccess1.csv')
+data = pd.read_csv('./data/Nakuru_FinAccess.csv')
 
 st.set_page_config(layout='wide', initial_sidebar_state='expanded')
 
@@ -37,6 +37,7 @@ style_metric_cards(
     border_left_color = "#9AD8E1",
     box_shadow = True)
 
+
 #Row B
 c1, c2 = st.columns((5, 4))
 with c1:
@@ -65,7 +66,7 @@ with c2:
 c1, c2 = st.columns((6, 4))
 with c1:
     st.subheader('Monthly Income vs Expenditure')
-    st.scatter_chart(data, x='avg_mnth_income', y='total_exp_per_moth', height=plot_height)
+    st.scatter_chart(data, x='avg_mnth_income', y='total_exp_per_month', height=plot_height)
 with c2:
     st.subheader('Use of insurance by Area')
     sns.countplot(x='area', hue='insurance', data=data)

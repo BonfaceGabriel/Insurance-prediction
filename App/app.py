@@ -4,46 +4,51 @@ import pandas as pd
 import joblib
 import lightgbm
 import shap
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import OneHotEncoder
 
 
 #data
-data = pd.read_csv('App/data/Nakuru_FinAccess.csv')
-data.drop(columns=['HHNo', 'income_bins'], inplace=True)
-data['most_important_life_goal'] = data['most_important_life_goal'].fillna('None')
-cluster1 = data[data['Clusters'] == 0]
-cluster2 = data[data['Clusters'] == 1]
-cluster3 = data[data['Clusters'] == 2]
-
-#SHAP
-shap_data = data.copy()
-shap_data = shap_data.drop(columns='Clusters')
-
-#cluster_data
-cluster_data = shap_data.copy()
-
-#preprocess data
-#scale numerical columns
-scaler = StandardScaler()
-scaled_data = scaler.fit_transform(shap_data[['age_of_respondent', 'avg_mnth_income', 'total_exp_per_month']])
-shap_data[['age_of_respondent', 'avg_mnth_income', 'total_exp_per_month']] = scaled_data
-
-#encode categorical columns
-cat_cols = ['most_important_life_goal', 'area', 'income_source', 'nearest_financial_prod']
-encoded = pd.get_dummies(shap_data[cat_cols])
-
-#join the data
-shap_data = pd.concat([shap_data.drop(cat_cols, axis=1), encoded], axis=1)
-
-#convert object type columns to bool for shap model
-cols = shap_data.select_dtypes(include=['object']).columns
-shap_data[cols] = shap_data[cols].astype('bool')
-
+data = pd.read_csv('./data/Nakuru_FinAccess2.csv')
+# st.write(data)
 
 #load models
-classifier = joblib.load('App/models/classifier.joblib')
-cluster = joblib.load('App/models/kproto.joblib')
- 
+classifier = joblib.load('./models/classifier.joblib')
+cluster = joblib.load('./models/new_model.joblib')
+scaler = joblib.load('./models/scaler.joblib')
+encoder = joblib.load('./models/encoder.joblib')
+
+print(cluster.cost_)
+#recommendended insurance products
+def recommend_insurance(row):
+    cluster_based_products = []
+    # for index, row in df.iterrows():
+    if (row['avg_mnth_income'] > 50000):  # High income cluster
+        cluster_based_products.extend(['Life Insurance', 'Investment-linked Insurance'])
+    elif  15000 < row['avg_mnth_income'] <= 50000:  # Medium income cluster
+        cluster_based_products.append('Life Insurance')
+    elif (row['avg_mnth_income'] <= 15000):  # Low income cluster
+        cluster_based_products.append('Basic Insurance Package')
+
+    # Add specific product recommendations based on characteristics
+    if row['chronic_illness'] or row['nhif_usage'] or row['most_important_life_goal'] == 'Health':
+        cluster_based_products.append("Health Insurance")
+    if row['motorvehicle_ownership']:
+        cluster_based_products.append("Motor Insurance")
+    if row['land_house_ownership']  or (row['most_important_life_goal'] in ['Assets' or 'Home']):
+        cluster_based_products.append("Property Insurance")
+    if (row['most_important_life_goal'] and row['income_source']) == 'Business' :
+        cluster_based_products.append("Business Insurance")
+    if (row['most_important_life_goal'] == 'Education' ):
+        cluster_based_products.append("Education Insurance")
+    if row['livestock_ownership']:
+        cluster_based_products.append("Livestock Insurance")
+    if row['income_source'] == 'Agriculture':
+        cluster_based_products.append("Agriculture Insurance")
+    if row['age_of_respondent'] > 50 or row['nssf_usage'] or row['income_source'] == 'Pension':
+        cluster_based_products.append("Retirement Insurance")
+
+    return list(set(cluster_based_products))
+
 #title
 st.title('Insurance Product Prediction App')
 
@@ -60,41 +65,23 @@ container_style = """
             border-color: 'white';
         }
     </style>
-    """
+  """
+
+#Clusters 
+if st.sidebar.checkbox('Show Clusters'):
+    data['recommended_products'] = data.apply(recommend_insurance, axis=1)
+    st.write(data[['Clusters', 'recommended_products']])
+
+#main page content
 c = st.container(border=True)
 c.markdown('''
     This app provides clustering results and insurance product recommendations based on customer characteristics in Nakuru County.
     
     Features:
-    - :grey-background[SHAP summary plots] to show cluster characteristics
     - :grey-background[Cluster Prediction] based on user inputs
     - :grey-background[Insurance product recommendation] based on the cluster
 
     ''')
-
-if st.sidebar.checkbox("Show SHAP Summary Plots"):
-            explainer = shap.TreeExplainer(classifier)
-            shap_values = explainer.shap_values(shap_data)
-
-            c1, c2 = st.columns(2)
-            with c1:
-                st.write("SHAP Summary for Cluster 1")
-                shap_values_for_cluster1 = shap_values[:, :, 0]
-                fig, ax = plt.subplots()
-                ax = shap.summary_plot(shap_values_for_cluster1, shap_data, plot_type="bar", show=False)
-                st.pyplot(fig)
-            with c2:
-                st.write("SHAP Summary for Cluster 2")
-                shap_values_for_cluster2 = shap_values[:, :, 1]
-                fig, ax = plt.subplots()
-                ax = shap.summary_plot(shap_values_for_cluster2, shap_data, plot_type="bar", show=False)
-                st.pyplot(fig)
-
-            st.write("SHAP Summary for Cluster 3")
-            shap_values_for_cluster3 = shap_values[:, :, 2]
-            fig, ax = plt.subplots()
-            ax = shap.summary_plot(shap_values_for_cluster3, shap_data, plot_type="bar", show=False)
-            st.pyplot(fig)
 
 uploaded_file = st.sidebar.file_uploader("Upload your input CSV file", type=["csv"])
 if uploaded_file is not None:
@@ -142,77 +129,74 @@ else:
     st.subheader('User Input')
     st.write(input_df)
     
-    #prediction data
-    pred_data = pd.concat([cluster_data, input_df]).reset_index(drop=True)
-    
+    preprocess_data = input_df.copy()
 
     #preprocess input data
     #numerical column
-    scaler = StandardScaler()
-    scaled_data = scaler.fit_transform(pred_data[['age_of_respondent', 'avg_mnth_income', 'total_exp_per_month']])
-    pred_data[['age_of_respondent', 'avg_mnth_income', 'total_exp_per_month']] = scaled_data
+    num_cols = ['age_of_respondent', 'avg_mnth_income', 'total_exp_per_month']
+    scaled_data = scaler.transform(preprocess_data[num_cols])
+    preprocess_data[num_cols] = scaled_data
 
-    #categorical columns
+    #categorical column
     cat_cols = ['most_important_life_goal', 'area', 'income_source', 'nearest_financial_prod']
-    encoded = pd.get_dummies(pred_data[cat_cols])
+
+    encoded = encoder.transform(preprocess_data[cat_cols])
+    one_hot_df = pd.DataFrame(encoded, 
+                          columns=encoder.get_feature_names_out(cat_cols))
 
     #processed data
-    processed_data = pd.concat([pred_data.drop(cat_cols, axis=1), encoded], axis=1)
+    processed_data = pd.concat([preprocess_data.drop(cat_cols, axis=1), one_hot_df], axis=1)
     cols = processed_data.select_dtypes(include=['object']).columns
     processed_data[cols] = processed_data[cols].astype('bool')
-   
+    print(processed_data.info()) 
 
     #predict
-    pred_df = processed_data.tail(1)
-    prediction = classifier.predict(pred_df)
+    prediction = classifier.predict(processed_data)
+    input_df['Clusters'] = prediction
+    input_df['recommended_products'] = input_df.apply(recommend_insurance, axis=1) 
+    insurance_products = input_df['recommended_products'].values[0]
+
+
+    #cluster analysis
+    cluster_data = data[data['Clusters'] == prediction[0]]
+
 
 
     if st.button('Make Prediction'):
         st.subheader('Insurance Product Prediction')
-        if prediction == 0:
-            c = st.container(border=True)
-            c.markdown('''
-                The customer belongs to cluster 1.
+        cluster_size = len(cluster_data)
+        average_income = round(cluster_data['avg_mnth_income'].mean(), 0)
+        average_age = round(cluster_data['age_of_respondent'].mean(), 0)
 
-                Cluster Description:
-                - Old low income farmers
-                
-                Probable insurance product:
-                - Crop Insurance
-                - Livestock Insurance
-                - Basic Health Insurance
-                - Term Life Insurance
-
-                ''')
-        elif prediction == 1:
-            c = st.container(border=True)
-            c.markdown('''
-                The customer belongs to Cluster 2.
-                
-                Cluster Description:
-                - Young small business owners
-                
-                Probable insurance product:
-                - Business property insurance
-                - General liability insurance
-                - Professional liability insurance(if applicable to the business)
-
-                ''')
-        else:
-            c = st.container(border=True)
-            c.markdown('''
-                The customer belongs to Cluster 3.
-
-                Cluster Description:
-                - Middle aged, average sized business owners 
-                
-                Probable insurance product:
-                - Workers compensation Insurance(if applicable)
-                - Business property insurance
-                - Product liability insurance
-                - Life insurance
-
-                ''')
+        # Display Card
+        c = st.container()
+        c.markdown(
+            f"""
+            <div style="
+                background-color: rgba(26, 26,36, 1);
+                border: 2px solid #e3e3e3;
+                border-radius: 10px;
+                padding: 20px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                font-family: Arial, sans-serif;
+            ">
+                <h3 style="text-align: center; color: #333;">Customer Cluster Information</h3>
+                <p style="text-align: left; font-size: 16px; color: #707070;">
+                    <b>The customer belongs to cluster {prediction}.</b><br>
+                    <b style="color: #707070;">------------------------------------------------------</b><br>
+                    <b>Size:</b> <em style="color: #707070;">{cluster_size} customers </em><br>
+                    -------------------------------------------------------<br>
+                    <b>RECOMMENDED INSURANCE PRODUCTS:</b><br>
+                    {' '.join(f'<li style="color: #707070;">{i}</li>' for i in insurance_products)}
+                    <b style="color: #707070;">-------------------------------------------------------</b><br>
+                    <b style="color: #707070;">Average Cluster Income:</b> <em style="color: #707070;">KES {average_income:,}</em><br>
+                    <b style="color: #707070;">-------------------------------------------------------</b><br>
+                    <b style="color: #707070;">Average Cluster Age:</b> <em style="color: #707070;"> {average_age} years</em>
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
     st.markdown('''
                 ---
