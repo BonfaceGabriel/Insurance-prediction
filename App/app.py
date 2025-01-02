@@ -67,11 +67,6 @@ container_style = """
     </style>
   """
 
-#Clusters 
-if st.sidebar.checkbox('Show Clusters'):
-    data['recommended_products'] = data.apply(recommend_insurance, axis=1)
-    st.write(data[['Clusters', 'recommended_products']])
-
 #main page content
 c = st.container(border=True)
 c.markdown('''
