@@ -126,42 +126,57 @@ else:
         features = pd.DataFrame(data, index=[0])
         return features
     input_df = user_input_features()
-    st.subheader('User Input')
+st.subheader('User Input')
+
+if uploaded_file:
+    st.write(input_df.head())
+else:
     st.write(input_df)
-    
-    preprocess_data = input_df.copy()
 
-    #preprocess input data
-    #numerical column
-    num_cols = ['age_of_respondent', 'avg_mnth_income', 'total_exp_per_month']
-    scaled_data = scaler.transform(preprocess_data[num_cols])
-    preprocess_data[num_cols] = scaled_data
+preprocess_data = input_df.copy()
 
-    #categorical column
-    cat_cols = ['most_important_life_goal', 'area', 'income_source', 'nearest_financial_prod']
+#preprocess input data
+#numerical column
+num_cols = ['age_of_respondent', 'avg_mnth_income', 'total_exp_per_month']
+scaled_data = scaler.transform(preprocess_data[num_cols])
+preprocess_data[num_cols] = scaled_data
 
-    encoded = encoder.transform(preprocess_data[cat_cols])
-    one_hot_df = pd.DataFrame(encoded, 
-                          columns=encoder.get_feature_names_out(cat_cols))
+#categorical column
+cat_cols = ['most_important_life_goal', 'area', 'income_source', 'nearest_financial_prod']
 
+<<<<<<< HEAD
     #processed data
     processed_data = pd.concat([preprocess_data.drop(cat_cols, axis=1), one_hot_df], axis=1)
     cols = processed_data.select_dtypes(include=['object']).columns
     processed_data[cols] = processed_data[cols].astype('bool') 
+=======
+encoded = encoder.transform(preprocess_data[cat_cols])
+one_hot_df = pd.DataFrame(encoded, 
+                        columns=encoder.get_feature_names_out(cat_cols))
+>>>>>>> 9330e5f (CSV importation and prediction)
 
-    #predict
-    prediction = classifier.predict(processed_data)
-    input_df['Clusters'] = prediction
-    input_df['recommended_products'] = input_df.apply(recommend_insurance, axis=1) 
-    insurance_products = input_df['recommended_products'].values[0]
+#processed data
+processed_data = pd.concat([preprocess_data.drop(cat_cols, axis=1), one_hot_df], axis=1)
+cols = processed_data.select_dtypes(include=['object']).columns
+processed_data[cols] = processed_data[cols].astype('bool')
+print(processed_data.info()) 
+
+#predict
+prediction = classifier.predict(processed_data)
+input_df['Clusters'] = prediction
+input_df['recommended_products'] = input_df.apply(recommend_insurance, axis=1) 
+insurance_products = input_df['recommended_products'].values[0]
 
 
-    #cluster analysis
-    cluster_data = data[data['Clusters'] == prediction[0]]
 
 
+#cluster analysis
+cluster_data = data[data['Clusters'] == prediction[0]]
 
-    if st.button('Make Prediction'):
+if st.button('Make Prediction'):
+    if uploaded_file:
+        st.write(input_df[['Clusters', 'recommended_products']])
+    else:
         st.subheader('Insurance Product Prediction')
         cluster_size = len(cluster_data)
         average_income = round(cluster_data['avg_mnth_income'].mean(), 0)
@@ -206,7 +221,7 @@ else:
 
         
 
-    
+
 
 
 
