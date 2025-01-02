@@ -186,7 +186,7 @@ else:
                     <b>Size:</b> <em style="color: #707070;">{cluster_size} customers </em><br>
                     -------------------------------------------------------<br>
                     <b>RECOMMENDED INSURANCE PRODUCTS:</b><br>
-                    {' '.join(f'<li style="color: #707070;">{i}</li>' for i in insurance_products)}
+                    {' '.join(f'<li style="color: #707070;"><em style="color: #707070;">{i}</em></li>' for i in insurance_products)}
                     <b style="color: #707070;">-------------------------------------------------------</b><br>
                     <b style="color: #707070;">Average Cluster Income:</b> <em style="color: #707070;">KES {average_income:,}</em><br>
                     <b style="color: #707070;">-------------------------------------------------------</b><br>
