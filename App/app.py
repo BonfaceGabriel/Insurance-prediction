@@ -10,13 +10,17 @@ from sklearn.preprocessing import OneHotEncoder
 from ydata_profiling import ProfileReport
 from bs4 import BeautifulSoup
 from streamlit_card import card
+import hydralit_components as hc
+import time
 
 
 st.set_page_config(
         page_title="Insurance Recommendation System",
         page_icon="🏥",
-        layout="wide"
+        layout="wide", 
+        initial_sidebar_state="collapsed"
     )
+
 
 
 st.markdown("""
@@ -84,38 +88,6 @@ def preprocess(df):
     return processed_data
 
 
-
-# #recommendended insurance products
-# def recommend_insurance(row):
-#     cluster_based_products = []
-#     # for index, row in df.iterrows():
-#     if (row['avg_mnth_income'] > 50000):  # High income cluster
-#         cluster_based_products.extend(['Life Insurance', 'Investment-linked Insurance'])
-#     elif  15000 < row['avg_mnth_income'] <= 50000:  # Medium income cluster
-#         cluster_based_products.append('Life Insurance')
-#     elif (row['avg_mnth_income'] <= 15000):  # Low income cluster
-#         cluster_based_products.append('Basic Insurance Package')
-
-#     # Add specific product recommendations based on characteristics
-#     if row['chronic_illness'] or row['nhif_usage'] or row['most_important_life_goal'] == 'Health':
-#         cluster_based_products.append("Health Insurance")
-#     if row['motorvehicle_ownership']:
-#         cluster_based_products.append("Motor Insurance")
-#     if row['land_house_ownership']  or (row['most_important_life_goal'] in ['Assets' or 'Home']):
-#         cluster_based_products.append("Property Insurance")
-#     if (row['most_important_life_goal'] and row['income_source']) == 'Business' :
-#         cluster_based_products.append("Business Insurance")
-#     if (row['most_important_life_goal'] == 'Education' ):
-#         cluster_based_products.append("Education Insurance")
-#     if row['livestock_ownership']:
-#         cluster_based_products.append("Livestock Insurance")
-#     if row['income_source'] == 'Agriculture':
-#         cluster_based_products.append("Agriculture Insurance")
-#     if row['age_of_respondent'] > 50 or row['nssf_usage'] or row['income_source'] == 'Pension':
-#         cluster_based_products.append("Retirement Insurance")
-
-#     return list(set(cluster_based_products))
-
 class InsuranceRecommender:
     def __init__(self, model_path, api_key):
         with open(model_path, "rb") as model_file:
@@ -174,19 +146,6 @@ class InsuranceRecommender:
                             "histogram": getattr(var_data, 'histogram', {}).get('counts', [])
                         }
             except AttributeError:
-                # try:
-                #     # Method 2: Using get_description
-                #     variables = profile_report.get_description()
-                #     for col, var_data in variables.items():
-                #         if isinstance(var_data, dict) and var_data.get('type') == "Numeric":
-                #             numeric_distributions[col] = {
-                #                 "mean": var_data.get('mean', 0),
-                #                 "std": var_data.get('std', 0),
-                #                 "min": var_data.get('min', 0),
-                #                 "max": var_data.get('max', 0),
-                #                 "histogram": var_data.get('histogram', {}).get('counts', [])
-                #             }
-                # except AttributeError:
                     pass
 
             return text_summary, numeric_distributions, correlation_matrix
@@ -199,11 +158,41 @@ class InsuranceRecommender:
 
 
     def generate_recommendations(self, text_summary, numeric_distributions, correlation_matrix):
-        prompt = f"Given the following profile report: {text_summary}\nDistributions: {json.dumps(numeric_distributions)}\n and Correlations: {json.dumps(correlation_matrix)}\n Pretend you are an insurance specialist, suggest 5 insurance products that the customers belonging to this cluster would get and give short concise reasonings in point form for each putting emphasis on the most important factors considered."
+        prompt = f"""Given the following profile report: {text_summary}\n
+        Distributions: {json.dumps(numeric_distributions)}\n 
+        and Correlations: {json.dumps(correlation_matrix)}\n 
+        suggest top 5 insurance products that the customers belonging to this cluster would get 
+        and give comprehensive reasonings for each.
+        The format should be:
+            The opening statements should read:Recommended Products based on Cluster Profile similar to yours:
+
+            1. Product 
+                - List of reasons why this product is recommended: 
+        Remove the usual beginning and ending phrases of a prompt, 
+        and the last part should be the last recommended product and 
+        its list of reasons. In this formatting,
+        assume this tool is going to be used by a sales agent to recommend products to a customer.
+        """
         result = self.call_claude_api(prompt) 
         return result
     def analyze_customer_inputs(self, customer_data, cluster_recommendations):
-        prompt = f"Given the following Customer Data: {customer_data}\n and the Cluster Recommendations: {cluster_recommendations} for the cluster the customer belongs to, \nAnalyze the customer attributs and suggest products unique to the customer which are not included in {cluster_recommendations}. Base these recommendations on the inputs and title them 'Products Unique to the Customer'. "
+        prompt = f"""Given the following Customer Data: {customer_data}\n 
+        and the Cluster Recommendations: {cluster_recommendations} 
+        for the cluster the customer belongs to, \n
+        analyze the customer attributes 
+        and suggest products unique to the customer based on their input which are not included in {cluster_recommendations}. 
+        Title them 'Products Unique to the Customer'. 
+        The format should be:
+            Products Unique to the Customer:
+
+            1. Product 
+                - List of reasons why this product is recommended
+
+        Remove the usual beginning and ending phrases of a prompt, 
+        and the last part should be the last recommended product and 
+        its list of reasons. In this formatting,
+         assume this tool is going to be used by a sales agent to recommend products to a customer.
+        """
         result = self.call_claude_api(prompt)
         return result
     def get_customer_recommendations(self, preprocessed_data, customer_data):
@@ -226,7 +215,7 @@ recommender = InsuranceRecommender(model_path="./models/classifier.joblib", api_
 
 
 #title
-st.title('Insurance Product Recommendation System')
+st.title('AI-Powered Insurance Product Recommendation System')
 
 #sidebar
 st.sidebar.title('User Input Features')
@@ -291,51 +280,46 @@ preprocess_data = preprocess(preprocess_data)
 
 
 if st.button('Get Recommendations'):
-    # Initialize the recommender
-    recommender = InsuranceRecommender(
-        model_path="./models/classifier.joblib",
-        api_key=st.secrets["api_key"]
-    )
+    with st.spinner('Getting Recommendations...'):
+        # Initialize the recommender
+        recommender = InsuranceRecommender(
+            model_path="./models/classifier.joblib",
+            api_key=st.secrets["api_key"]
+        )
 
-   
-    # Get recommendations
-    recommendations = recommender.get_customer_recommendations(preprocessed_data=preprocess_data, customer_data=input_df)
-
-    # Display recommendations in expandable sections with custom styling
-    st.markdown("## Insurance Recommendations")
     
-    # Cluster recommendations
-    with st.expander("📊 Cluster-Based Recommendations", expanded=True):
-        st.markdown("""
-            <div style='background-color: #707070; padding: 20px; border-radius: 10px;'>
-                <h4>Based on profiles similar to yours</h4>
-                {}
-            </div>
-        """.format(recommendations["Cluster Recommendations"]), unsafe_allow_html=True)
+        # Get recommendations
+        recommendations = recommender.get_customer_recommendations(preprocessed_data=preprocess_data, customer_data=input_df)
+
+        # Display recommendations in expandable sections with custom styling
+        st.markdown("## Insurance Recommendations")
+        
+        #Cluster
+        with st.expander("👥 Customer Cluster", expanded=True):
+            st.markdown(f"The customer belongs to Cluster {recommendations['Predicted Cluster']}")
+
+        # Cluster recommendations
+        with st.expander("📊 Cluster-Based Recommendations", expanded=True):
+            st.markdown("""
+                <div style='background-color: #707070; padding: 20px; border-radius: 10px;'>
+                    <h4>Based on profiles similar to yours</h4>
+                    {}
+                </div>
+            """.format(recommendations["Cluster Recommendations"]), unsafe_allow_html=True)
+            
+
+        # Personal recommendations
+        with st.expander("👤 Personalized Recommendations", expanded=True):
+            st.markdown("""
+                <div style='background-color: #707070; padding: 20px; border-radius: 10px;'>
+                    <h4>Tailored specifically for you</h4>
+                    {}
+                </div>
+            """.format(recommendations["Products Unique to the Customer"]), unsafe_allow_html=True)
+        
         
 
-    # Personal recommendations
-    with st.expander("👤 Personalized Recommendations", expanded=True):
-        st.markdown("""
-            <div style='background-color: #707070; padding: 20px; border-radius: 10px;'>
-                <h4>Tailored specifically for you</h4>
-                {}
-            </div>
-        """.format(recommendations["Products Unique to the Customer"]), unsafe_allow_html=True)
 
-    # Additional insights
-    with st.expander("🔍 Additional Insights"):
-        st.write(f"Your profile has been matched with Cluster {recommendations['Predicted Cluster']}")
-        st.markdown("### Key Factors Considered:")
-        st.write("- Age and Life Stage")
-        st.write("- Income Level")
-        st.write("- Important Life Goals")
-        st.write("- Occupation Type")
-        st.write("- Health Status")
-        st.write("- Financial Health and Accessibility")
-
-
-    
 st.markdown('''
             ---
             Created with ❤️ by :red-background[Bonface Odhiambo]
