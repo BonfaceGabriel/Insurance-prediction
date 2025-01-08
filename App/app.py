@@ -96,9 +96,8 @@ class InsuranceRecommender:
 
     def call_claude_api(self, prompt):
         response = self.client.messages.create(
-            model="claude-3-opus-20240229",
-            max_tokens=500,
-            temperature=0.7,
+            model="claude-3-5-sonnet-20240620",
+            max_tokens=1024,
             messages=[
                 {"role": "user", "content": prompt}
             ]
@@ -172,6 +171,8 @@ class InsuranceRecommender:
         and the last part should be the last recommended product and 
         its list of reasons. In this formatting,
         assume this tool is going to be used by a sales agent to recommend products to a customer.
+        Other things to consider: The data is used is from the Kenyan market so ideally the currency is Kenyan Shillings. 
+        Us ethis when doing the financial attributes analysis.
         """
         result = self.call_claude_api(prompt) 
         return result
@@ -191,7 +192,9 @@ class InsuranceRecommender:
         Remove the usual beginning and ending phrases of a prompt, 
         and the last part should be the last recommended product and 
         its list of reasons. In this formatting,
-         assume this tool is going to be used by a sales agent to recommend products to a customer.
+        assume this tool is going to be used by a sales agent to recommend products to a customer.
+        Other things to consider: The data is used is from the Kenyan market so ideally the currency is Kenyan Shillings. 
+        Us ethis when doing the financial attributes analysis.
         """
         result = self.call_claude_api(prompt)
         return result
