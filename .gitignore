@@ -1,6 +1,7 @@
 Updated Anonymized Weighted FinAccess 2021.xlsx
-Insurance-Product-Prediction.ipynb
+/home/gabriel/pred/Insurance-prediction/Insurance-Product-Prediction.ipynb
 env
 MOCK_DATA.csv
 .env
 .streamlit
+.cursorrules
