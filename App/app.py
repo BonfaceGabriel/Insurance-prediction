@@ -156,16 +156,16 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 #data
-data = pd.read_csv('./data/nakuru_dataset.csv')
+data = pd.read_csv('App/data/nakuru_dataset.csv')
 data['insurance'] = data['insurance'].map({'Yes': True, 'No': False})
 
 
 
 #load models
-classifier = joblib.load('./models/classifier.joblib')
-# cluster = joblib.load('./models/new_model.joblib')
-scaler = joblib.load('./models/scaler.joblib')
-encoder = joblib.load('./models/encoder.joblib')
+classifier = joblib.load('App/models/classifier.joblib')
+# cluster = joblib.load('App/models/new_model.joblib')
+scaler = joblib.load('App/models/scaler.joblib')
+encoder = joblib.load('App/models/encoder.joblib')
 
 def preprocess(df):
     num_cols = ['age_of_respondent', 'avg_mnth_income', 'total_exp_per_month']
@@ -773,7 +773,7 @@ class InsuranceRecommender:
             "Feature Importance": feature_importance
         }
 
-recommender = InsuranceRecommender(model_path="./models/classifier.joblib", api_key=st.secrets["api_key"])
+recommender = InsuranceRecommender(model_path="App/models/classifier.joblib", api_key=st.secrets["api_key"])
 
 
 
@@ -1126,7 +1126,7 @@ if analyze_button:
     with st.spinner('Analyzing profile and generating recommendations...'):
         try:
             recommender = InsuranceRecommender(
-                model_path="./models/classifier.joblib",
+                model_path="App/models/classifier.joblib",
                 api_key=st.secrets["api_key"]
             )
             
