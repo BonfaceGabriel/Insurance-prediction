@@ -1113,7 +1113,7 @@ def create_dashboard(recommendations):
                 polar=dict(radialaxis=dict(visible=True, range=[0, 100])),
                 showlegend=False
             )
-        st.plotly_chart(fig)
+            st.plotly_chart(fig)
 
 #Action Button
 col1, col2, col3 = st.columns([1,2,1])
