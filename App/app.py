@@ -13,6 +13,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import shap
 from sklearn.preprocessing import StandardScaler
+from google import genai
 
 
 st.set_page_config(
@@ -544,15 +545,24 @@ class InsuranceRecommender:
             print(f"Error initializing SHAP explainer: {str(e)}")
             self.explainer = None
 
+    # def call_claude_api(self, prompt):
+    #     response = self.client.messages.create(
+    #         model="claude-3-5-sonnet-20240620",
+    #         max_tokens=1024,
+    #         messages=[
+    #             {"role": "user", "content": prompt}
+    #         ]
+    #     )
+    #     return response.content[0].text
+    
     def call_claude_api(self, prompt):
-        response = self.client.messages.create(
-            model="claude-3-5-sonnet-20240620",
-            max_tokens=1024,
-            messages=[
-                {"role": "user", "content": prompt}
-            ]
+        response = self.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=prompt
+           
         )
         return response.content[0].text
+    
 
     def extract_report_content(self, profile_report):
         try:
