@@ -532,7 +532,7 @@ class InsuranceRecommender:
         with open(model_path, "rb") as model_file:
             self.cluster_model = joblib.load(model_file)
         # self.client = Anthropic(api_key=api_key)
-        self.client = genai.Client(api_key = "AIzaSyDULaoqPy3TC0CUCLrJYQHxMhBCw4svYtQ")
+        self.client = genai.Client(api_key = api_key)
         self.risk_assessor = RiskAssessment()
         self.profiler = CustomerProfile()
         self.products = InsuranceProducts()
@@ -557,7 +557,7 @@ class InsuranceRecommender:
     #     return response.content[0].text
     
     def call_claude_api(self, prompt):
-        response = self.models.generate_content(
+        response = self.client.models.generate_content(
             model="gemini-2.0-flash",
             contents=prompt
            
