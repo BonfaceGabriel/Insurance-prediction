@@ -531,7 +531,8 @@ class InsuranceRecommender:
     def __init__(self, model_path, api_key):
         with open(model_path, "rb") as model_file:
             self.cluster_model = joblib.load(model_file)
-        self.client = Anthropic(api_key=api_key)
+        # self.client = Anthropic(api_key=api_key)
+        self.client = genai.Client(api_key = "AIzaSyDULaoqPy3TC0CUCLrJYQHxMhBCw4svYtQ")
         self.risk_assessor = RiskAssessment()
         self.profiler = CustomerProfile()
         self.products = InsuranceProducts()
@@ -561,7 +562,7 @@ class InsuranceRecommender:
             contents=prompt
            
         )
-        return response.content[0].text
+        return response.text
     
 
     def extract_report_content(self, profile_report):
