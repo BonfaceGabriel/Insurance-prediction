@@ -814,12 +814,6 @@ def user_input_features():
             border: 1px solid rgba(128, 128, 128, 0.2);
         }
         
-        /* Style for customer info header */
-        .customer-info-header {
-            color: white;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-        }
         
         /* Remove white background from input section */
         .input-section {
