@@ -723,27 +723,6 @@ c.markdown('''
 
 
 def user_input_features():
-    st.markdown("""
-        <style>
-        /* Remove white background from tab buttons */
-        .stTabs [data-baseweb="tab"] {
-            background-color: transparent !important;
-            color: white !important;
-            border: 1px solid rgba(128, 128, 128, 0.2);
-        }
-        
-        
-        /* Remove white background from input section */
-        .input-section {
-            background-color: transparent !important;
-            border: 1px solid rgba(128, 128, 128, 0.2);
-            border-radius: 10px;
-            padding: 20px;
-        }
-        </style>
-        
-        # <h2 class='customer-info-header'>Customer Information</h2>
-    """, unsafe_allow_html=True)
     st.subheader('Customer Information')
     
     with st.container():
