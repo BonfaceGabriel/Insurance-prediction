@@ -832,7 +832,8 @@ def user_input_features():
         
         # <h2 class='customer-info-header'>Customer Information</h2>
     """, unsafe_allow_html=True)
-    with st.subheader('Customer Information')
+    st.subheader('Customer Information')
+    
     with st.container():
         st.markdown('<div class="input-section">', unsafe_allow_html=True)
         
