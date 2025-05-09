@@ -1,27 +1,3 @@
-Okay, I've reviewed your Streamlit application code and will consolidate and refine the CSS styling to address redundancy, potential conflicts, and improve overall consistency.
-
-Here's the plan:
-
-Single Global CSS Block: All CSS rules will be moved into a single st.markdown("""<style>...</style>""", unsafe_allow_html=True) block placed right after st.set_page_config.
-
-Remove Redundant Style Blocks: Subsequent st.markdown blocks containing only <style> tags will be removed from user_input_features, create_dashboard, and the analyze_button logic.
-
-Harmonize Styles:
-
-Ensure the .input-section is transparent with a visible border, and its labels are styled for a dark theme.
-
-Standardize tab styling using the more detailed version.
-
-Apply consistent styling for cards (metric, recommendation, chart).
-
-Convert inline styles in create_dashboard for recommendation headers and items into CSS classes.
-
-Improve Selectors: Use more robust selectors where possible, and style Streamlit's native elements (like h3 for st.subheader) directly.
-
-Enhance Readability: Organize the CSS rules logically.
-
-Here's the modified code:
-
 import streamlit as st
 import matplotlib.pyplot as plt
 import pandas as pd
