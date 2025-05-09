@@ -531,8 +531,8 @@ class InsuranceRecommender:
     def __init__(self, model_path, api_key):
         with open(model_path, "rb") as model_file:
             self.cluster_model = joblib.load(model_file)
-        # self.client = Anthropic(api_key=api_key)
-        self.client = genai.Client(api_key = api_key)
+        self.client = Anthropic(api_key=api_key)
+        # self.client = genai.Client(api_key = api_key)
         self.risk_assessor = RiskAssessment()
         self.profiler = CustomerProfile()
         self.products = InsuranceProducts()
@@ -546,23 +546,23 @@ class InsuranceRecommender:
             print(f"Error initializing SHAP explainer: {str(e)}")
             self.explainer = None
 
-    # def call_claude_api(self, prompt):
-    #     response = self.client.messages.create(
-    #         model="claude-3-5-sonnet-20240620",
-    #         max_tokens=1024,
-    #         messages=[
-    #             {"role": "user", "content": prompt}
-    #         ]
-    #     )
-    #     return response.content[0].text
-    
     def call_claude_api(self, prompt):
-        response = self.client.models.generate_content(
-            model="gemini-2.5-pro",
-            contents=prompt
-           
+        response = self.client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            messages=[
+                {"role": "user", "content": prompt}
+            ]
         )
-        return response.text
+        return response.content[0].text
+    
+    # def call_claude_api(self, prompt):
+    #     response = self.client.models.generate_content(
+    #         model="gemini-2.5-pro",
+    #         contents=prompt
+           
+    #     )
+    #     return response.text
     
 
     def extract_report_content(self, profile_report):
