@@ -71,6 +71,8 @@ st.markdown("""
             border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
+    </style>
+    """, unsafe_allow_html=True)
 
 #data
 data = pd.read_csv('App/data/nakuru_dataset.csv')
